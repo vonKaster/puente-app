@@ -507,7 +507,7 @@ Se redujeron los instrumentos de 20 a 5 (AAPL, MSFT, GOOGL, AMZN, META).
 
 ## Autor
 
-**Franco Caminos**
+**Franco Caminos**  
 Proyecto: PUENTE - Backend Java Technical Challenge  
 Fecha: Octubre 2025
 
