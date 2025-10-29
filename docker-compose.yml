@@ -1,0 +1,54 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: puente_db
+    environment:
+      POSTGRES_DB: puente
+      POSTGRES_USER: puente
+      POSTGRES_PASSWORD: puente123
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - puente-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U puente"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: puente_app
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-puente}
+      DB_USER: ${DB_USER:-puente}
+      DB_PASSWORD: ${DB_PASSWORD:-puente123}
+      ALPHAVANTAGE_API_KEY: ${ALPHAVANTAGE_API_KEY:-demo}
+      JWT_SECRET: ${JWT_SECRET:-puente-dev-secret-key-change-in-production-minimum-256-bits}
+    ports:
+      - "8080:8080"
+    networks:
+      - puente-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+networks:
+  puente-network:
+    driver: bridge
+
+volumes:
+  db_data:

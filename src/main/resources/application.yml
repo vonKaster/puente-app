@@ -1,0 +1,67 @@
+spring:
+  application:
+    name: puente-app
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:puente}
+    username: ${DB_USER:puente}
+    password: ${DB_PASSWORD:puente123}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=100,expireAfterWrite=5m
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:puente-dev-secret-key-change-in-production-minimum-256-bits}
+  expiration: 86400000 # 24 hours in milliseconds
+
+# AlphaVantage API Configuration
+alphavantage:
+  api:
+    base-url: ${ALPHAVANTAGE_BASE_URL:https://www.alphavantage.co}
+    key: ${ALPHAVANTAGE_API_KEY:demo}
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# Logging
+logging:
+  level:
+    root: INFO
+    com.puente.app: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+
+# SpringDoc OpenAPI
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+

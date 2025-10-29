@@ -1,0 +1,769 @@
+{
+	"info": {
+		"_postman_id": "puente-api-collection",
+		"name": "PUENTE API - Interview Challenge",
+		"description": "Collection completa para probar la API de PUENTE - Gestión de instrumentos financieros.\n\n## Variables:\n- `base_url`: URL base de la API (default: http://localhost:8080)\n- `token`: JWT token (se guarda automáticamente al hacer login)\n\n## Uso:\n1. Ejecutar **Login Admin** o **Registrar Usuario**\n2. El token se guarda automáticamente\n3. Todos los demás endpoints usan el token automáticamente\n\n## Nota sobre datos:\nLa API consulta AlphaVantage para datos reales. Si el rate limit se alcanza, utiliza mock data realista como fallback. El campo `mocked_data` en las respuestas indica el origen de los datos (true = mock, false = API real).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Autenticación",
+			"item": [
+				{
+					"name": "Login Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"token\", jsonData.token);",
+									"    pm.environment.set(\"token\", jsonData.token);",
+									"    console.log(\"Token guardado: \" + jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"fcaminos@puente.com\",\n  \"password\": \"puente\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Login con usuario admin predefinido.\n\nCredenciales:\n- Email: fcaminos@puente.com\n- Password: puente\n\nEl token JWT se guarda automáticamente."
+					},
+					"response": []
+				},
+				{
+					"name": "Registrar Usuario",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"token\", jsonData.token);",
+									"    pm.environment.set(\"token\", jsonData.token);",
+									"    console.log(\"Token guardado: \" + jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Juan Pérez\",\n  \"email\": \"juan.perez@example.com\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						},
+						"description": "Registra un nuevo usuario con rol USER.\n\nEl token JWT se guarda automáticamente tras el registro."
+					},
+					"response": []
+				},
+				{
+					"name": "Login Usuario Normal",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"token\", jsonData.token);",
+									"    pm.environment.set(\"token\", jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"juan.perez@example.com\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Login con usuario normal previamente registrado."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints de autenticación: registro y login.\n\nTodos los endpoints guardan el token JWT automáticamente."
+		},
+		{
+			"name": "2. Instrumentos Financieros",
+			"item": [
+				{
+					"name": "Listar Todos los Instrumentos",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/instruments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"instruments"
+							]
+						},
+						"description": "Retorna la lista de los 5 instrumentos financieros disponibles:\n- AAPL (Apple Inc)\n- MSFT (Microsoft)\n- GOOGL (Alphabet Inc)\n- AMZN (Amazon)\n- META (Meta Platforms)\n\n**Requiere autenticación** (cualquier usuario autenticado)."
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Detalles de AAPL",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/instruments/AAPL",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"instruments",
+								"AAPL"
+							]
+						},
+						"description": "Obtiene información detallada de Apple Inc (AAPL) incluyendo:\n- Precio actual (price)\n- Precio de apertura (open)\n- Precio máximo del día (high)\n- Precio mínimo del día (low)\n- Volumen de transacciones\n- Última actualización (asOf)\n- Origen de datos (mocked_data: true si es mock, false si es de AlphaVantage)\n\nLos precios se actualizan cada 5 minutos mediante un job automático."
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Detalles de MSFT",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/instruments/MSFT",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"instruments",
+								"MSFT"
+							]
+						},
+						"description": "Obtiene información detallada de Microsoft (MSFT)."
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Detalles de GOOGL",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/instruments/GOOGL",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"instruments",
+								"GOOGL"
+							]
+						},
+						"description": "Obtiene información detallada de Alphabet Inc (GOOGL)."
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Detalles de AMZN",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/instruments/AMZN",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"instruments",
+								"AMZN"
+							]
+						},
+						"description": "Obtiene información detallada de Amazon (AMZN)."
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Detalles de META",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/instruments/META",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"instruments",
+								"META"
+							]
+						},
+						"description": "Obtiene información detallada de Meta Platforms (META)."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para consultar instrumentos financieros.\n\nTodos requieren autenticación.\n\n**Nota:** Las respuestas incluyen el campo `mocked_data` que indica si los datos provienen de la API de AlphaVantage (false) o de mock data (true)."
+		},
+		{
+			"name": "3. Favoritos",
+			"item": [
+				{
+					"name": "Agregar AAPL a Favoritos",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/favorites/AAPL",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"favorites",
+								"AAPL"
+							]
+						},
+						"description": "Marca Apple (AAPL) como favorito del usuario autenticado."
+					},
+					"response": []
+				},
+				{
+					"name": "Agregar MSFT a Favoritos",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/favorites/MSFT",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"favorites",
+								"MSFT"
+							]
+						},
+						"description": "Marca Microsoft (MSFT) como favorito."
+					},
+					"response": []
+				},
+				{
+					"name": "Agregar GOOGL a Favoritos",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/favorites/GOOGL",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"favorites",
+								"GOOGL"
+							]
+						},
+						"description": "Marca Alphabet (GOOGL) como favorito."
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Mis Favoritos",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/favorites",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"favorites"
+							]
+						},
+						"description": "Retorna todos los instrumentos marcados como favoritos por el usuario autenticado.\n\nIncluye información completa de cada instrumento favorito."
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar AAPL de Favoritos",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/favorites/AAPL",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"favorites",
+								"AAPL"
+							]
+						},
+						"description": "Elimina Apple (AAPL) de los favoritos del usuario."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para gestionar favoritos del usuario.\n\nCada usuario puede marcar/desmarcar instrumentos como favoritos."
+		},
+		{
+			"name": "4. Usuarios (ADMIN)",
+			"item": [
+				{
+					"name": "Listar Todos los Usuarios",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						},
+						"description": "Lista todos los usuarios del sistema.\n\n**Requiere rol ADMIN**."
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Usuario por ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"1"
+							]
+						},
+						"description": "Obtiene detalles de un usuario específico por su ID.\n\n**Requiere rol ADMIN**."
+					},
+					"response": []
+				},
+				{
+					"name": "Promover Usuario a Admin",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/2/promote",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"2",
+								"promote"
+							]
+						},
+						"description": "Promueve un usuario a rol ADMIN.\n\nCambiar '2' por el ID del usuario a promover.\n\n**Requiere rol ADMIN**."
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Usuario",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"2"
+							]
+						},
+						"description": "Elimina un usuario del sistema.\n\nCambiar '2' por el ID del usuario a eliminar.\n\n**Requiere rol ADMIN**."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints de administración de usuarios.\n\n**Todos requieren rol ADMIN**."
+		},
+		{
+			"name": "5. Perfil de Usuario",
+			"item": [
+				{
+					"name": "Ver Mi Perfil",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"me"
+							]
+						},
+						"description": "Obtiene el perfil del usuario autenticado actual."
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Mi Perfil",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Juan Carlos Pérez\",\n  \"email\": \"juancarlos.perez@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"me"
+							]
+						},
+						"description": "Actualiza el nombre y/o email del usuario autenticado."
+					},
+					"response": []
+				},
+				{
+					"name": "Cambiar Mi Contraseña",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"newPassword\": \"newSecurePassword456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/me/password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"me",
+								"password"
+							]
+						},
+						"description": "Cambia la contraseña del usuario autenticado."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para gestionar el perfil del usuario autenticado."
+		},
+		{
+			"name": "6. Health Check",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/actuator/health",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"actuator",
+								"health"
+							]
+						},
+						"description": "Verifica que la aplicación esté funcionando correctamente.\n\n**No requiere autenticación**."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoint de salud de la aplicación (Spring Actuator)."
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
+

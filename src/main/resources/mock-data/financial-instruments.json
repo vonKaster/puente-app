@@ -1,0 +1,45 @@
+{
+  "instruments": {
+    "AAPL": {
+      "symbol": "AAPL",
+      "price": "268.81",
+      "open": "264.88",
+      "high": "269.12",
+      "low": "264.65",
+      "volume": "44888152"
+    },
+    "MSFT": {
+      "symbol": "MSFT",
+      "price": "531.52",
+      "open": "531.78",
+      "high": "534.58",
+      "low": "529.01",
+      "volume": "18734716"
+    },
+    "GOOGL": {
+      "symbol": "GOOGL",
+      "price": "185.42",
+      "open": "184.76",
+      "high": "186.35",
+      "low": "184.12",
+      "volume": "20152364"
+    },
+    "AMZN": {
+      "symbol": "AMZN",
+      "price": "215.33",
+      "open": "213.89",
+      "high": "216.77",
+      "low": "213.45",
+      "volume": "35642891"
+    },
+    "META": {
+      "symbol": "META",
+      "price": "595.28",
+      "open": "591.45",
+      "high": "597.89",
+      "low": "590.23",
+      "volume": "12453672"
+    }
+  }
+}
+
