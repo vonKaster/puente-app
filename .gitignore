@@ -39,6 +39,10 @@ build/
 ### Logs ###
 *.log
 
+### Deployment ###
+certbot/conf/
+certbot/www/
+
 ### OS ###
 .DS_Store
 Thumbs.db
