@@ -11,15 +11,19 @@ import org.springframework.stereotype.Component;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 @Component
 public class MockDataProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(MockDataProvider.class);
-    private final Map<String, QuoteResponse> mockData = new HashMap<>();
+    private final Map<String, List<QuoteResponse>> mockData = new HashMap<>();
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final Random random = new Random();
 
     @PostConstruct
     public void loadMockData() {
@@ -30,30 +34,52 @@ public class MockDataProvider {
 
             instruments.fields().forEachRemaining(entry -> {
                 String symbol = entry.getKey();
-                JsonNode data = entry.getValue();
+                JsonNode dataArray = entry.getValue();
+                
+                List<QuoteResponse> quotes = new ArrayList<>();
+                
+                dataArray.forEach(data -> {
+                    QuoteResponse mock = new QuoteResponse();
+                    mock.setSymbol(data.get("symbol").asText());
+                    mock.setPrice(data.get("price").asText());
+                    mock.setOpen(data.get("open").asText());
+                    mock.setHigh(data.get("high").asText());
+                    mock.setLow(data.get("low").asText());
+                    mock.setVolume(data.get("volume").asText());
+                    mock.setLatestTradingDay(LocalDate.now().toString());
+                    
+                    quotes.add(mock);
+                });
 
-                QuoteResponse mock = new QuoteResponse();
-                mock.setSymbol(data.get("symbol").asText());
-                mock.setPrice(data.get("price").asText());
-                mock.setOpen(data.get("open").asText());
-                mock.setHigh(data.get("high").asText());
-                mock.setLow(data.get("low").asText());
-                mock.setVolume(data.get("volume").asText());
-                mock.setLatestTradingDay(LocalDate.now().toString());
-
-                mockData.put(symbol, mock);
+                mockData.put(symbol, quotes);
             });
 
-            logger.info("Loaded mock data for {} instruments", mockData.size());
+            int totalVariations = mockData.values().stream()
+                .mapToInt(List::size)
+                .sum();
+            logger.info("Loaded mock data for {} instruments with {} total variations", 
+                mockData.size(), totalVariations);
         } catch (IOException e) {
             logger.error("Failed to load mock data", e);
         }
     }
 
     public QuoteResponse getMockQuote(String symbol) {
-        QuoteResponse mock = mockData.get(symbol);
-        if (mock != null) {
-            return mock;
+        List<QuoteResponse> quotes = mockData.get(symbol);
+        if (quotes != null && !quotes.isEmpty()) {
+            int index = random.nextInt(quotes.size());
+            QuoteResponse selected = quotes.get(index);
+            
+            QuoteResponse copy = new QuoteResponse();
+            copy.setSymbol(selected.getSymbol());
+            copy.setPrice(selected.getPrice());
+            copy.setOpen(selected.getOpen());
+            copy.setHigh(selected.getHigh());
+            copy.setLow(selected.getLow());
+            copy.setVolume(selected.getVolume());
+            copy.setLatestTradingDay(LocalDate.now().toString());
+            
+            return copy;
         }
 
         // Fallback genérico si no existe el símbolo
